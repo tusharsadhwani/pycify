@@ -1,4 +1,6 @@
 """CLI interface for pycify."""
+from __future__ import annotations
+
 import argparse
 
 from pycify import replace_py_with_pyc
