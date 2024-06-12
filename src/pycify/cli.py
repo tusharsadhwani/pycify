@@ -10,6 +10,8 @@ from pycify import replace_py_with_pyc
 class PycifyArgs:
     directory: str
     out_dir: str
+    python_version: str
+    ignore_file_patterns: list[str]
 
 
 def cli(argv: list[str] | None = None) -> None:

@@ -105,7 +105,10 @@ def replace_py_with_pyc(
             continue
 
         filename = file.removesuffix(".py")
-        version_info_minor = python_version.split(".")[1]
+        if python_version is None:
+            version_info_minor = str(sys.version_info.minor)
+        else:
+            version_info_minor = python_version.split(".")[1]
         pycache_filename = f"{filename}.cpython-3{version_info_minor}.pyc"
         pyc_path = os.path.join(pycache_path, pycache_filename)
         if not os.path.exists(pyc_path):
