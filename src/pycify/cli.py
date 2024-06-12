@@ -1,4 +1,5 @@
 """CLI interface for pycify."""
+
 from __future__ import annotations
 
 import argparse
@@ -22,5 +23,23 @@ def cli(argv: list[str] | None = None) -> None:
             "Defaults to replacing the existing `.py` files."
         ),
     )
+    parser.add_argument(
+        "--python-version",
+        help="Version of Python to compile your project with.",
+        default=None,
+    )
+    parser.add_argument(
+        "--ignore-file-patterns",
+        nargs="+",
+        help="List of file patterns to ignore when compiling.",
+        default=[
+            "setup.py",
+        ],
+    )
     args = parser.parse_args(argv, namespace=PycifyArgs)
-    replace_py_with_pyc(args.directory, out_folder=args.out_dir)
+    replace_py_with_pyc(
+        args.directory,
+        out_folder=args.out_dir,
+        python_version=args.python_version,
+        ignore_file_patterns=args.ignore_file_patterns,
+    )
