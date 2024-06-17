@@ -33,7 +33,7 @@ def cli(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--ignore-file-patterns",
         nargs="+",
-        help="List of file patterns to ignore when compiling.",
+        help="File patterns to ignore, eg. `setup.py` or `src/**/*_example.py`",
         default=[
             "setup.py",
         ],

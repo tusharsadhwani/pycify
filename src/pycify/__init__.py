@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import compileall
+import fnmatch
 import os
 import re
 import shutil
@@ -35,17 +36,31 @@ def replace_py_with_pyc(
     out_folder: str | None = None,
     python_version: str | None = None,
     ignore_file_patterns: list[str] | None = None,
-    _original_folder: str | None = None,
 ) -> list[str]:
     """
     Replaces all .py files with the cached .pyc files from __pycache__.
     If out_folder is provided, doesn't delete any existing Python files, simply
     creates the new `.pyc` files in the new location.
+    If ignore_file_patterns is provided, ignores any file and folder names
+    matching the patterns.
     """
-    if ignore_file_patterns is None:
-        ignore_file_patterns = []
-    if _original_folder is None:
-        _original_folder = folder
+    return _replace_py_with_pyc(
+        folder,
+        out_folder,
+        python_version,
+        ignore_file_patterns,
+        _original_folder=folder,
+    )
+
+
+def _replace_py_with_pyc(
+    folder: str,
+    out_folder: str | None = None,
+    python_version: str | None = None,
+    ignore_file_patterns: list[str] | None = None,
+    *,
+    _original_folder: str,
+) -> list[str]:
     if python_version is None:
         compileall.compile_dir(folder, quiet=1, force=True)
     else:
@@ -81,7 +96,7 @@ def replace_py_with_pyc(
         out_subfolder = os.path.join(out_folder, name)
         if os.path.isdir(subfolder):
             created_pyc_files.extend(
-                replace_py_with_pyc(
+                _replace_py_with_pyc(
                     subfolder,
                     out_subfolder,
                     python_version,
@@ -106,8 +121,11 @@ def replace_py_with_pyc(
             continue
 
         relative_path_file = os.path.relpath(filepath, _original_folder)
-        if any(
-            re.match(pattern, relative_path_file) for pattern in ignore_file_patterns
+        if ignore_file_patterns and any(
+            re.match(
+                removesuffix(fnmatch.translate(pattern), "\\Z"), relative_path_file
+            )
+            for pattern in ignore_file_patterns
         ):
             print(f"{yellow('NOTE:')} Ignoring {filepath} as per ignore_file_patterns.")
             continue
@@ -132,8 +150,9 @@ def replace_py_with_pyc(
         if folder == out_folder:
             os.remove(filepath)
 
-    # Finally delete the pycache, it should be empty.
-    os.rmdir(pycache_path)
+    # Delete the pycache as we generated at least parts of it, and we
+    # don't want unrelated .pyc files in the given folder.
+    shutil.rmtree(pycache_path)
 
     return created_pyc_files
 
