@@ -22,6 +22,14 @@ def yellow(string: str, /) -> str:
     return f"\033[33m{string}\033[m"
 
 
+def removesuffix(string: str, suffix: str) -> str:
+    """Remove suffix if exists."""
+    if string[-len(suffix) :] == suffix:
+        return string[: -len(suffix)]
+
+    return string
+
+
 def replace_py_with_pyc(
     folder: str,
     out_folder: str | None = None,
@@ -104,7 +112,7 @@ def replace_py_with_pyc(
             print(f"{yellow('NOTE:')} Ignoring {filepath} as per ignore_file_patterns.")
             continue
 
-        filename = file.removesuffix(".py")
+        filename = removesuffix(file, ".py")
         if python_version is None:
             version_info_minor = str(sys.version_info.minor)
         else:
