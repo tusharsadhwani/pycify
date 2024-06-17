@@ -5,10 +5,12 @@ from __future__ import annotations
 import os.path
 import shutil
 import subprocess
+import typing
 
 import pycify
 
-FileTree = dict[str, "FileTree"]
+if typing.TYPE_CHECKING:
+    FileTree: typing.TypeAlias = "dict[str, FileTree]"
 
 
 def pyc_tree(folder_path: str) -> FileTree:

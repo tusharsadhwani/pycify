@@ -11,6 +11,14 @@ def yellow(string: str, /) -> str:
     return f"\033[33m{string}\033[m"
 
 
+def removesuffix(string: str, suffix: str) -> str:
+    """Remove suffix if exists."""
+    if string[-len(suffix) :] == suffix:
+        return string[: -len(suffix)]
+
+    return string
+
+
 def replace_py_with_pyc(folder: str, out_folder: str | None = None) -> list[str]:
     """
     Replaces all .py files with the cached .pyc files from __pycache__.
@@ -45,7 +53,7 @@ def replace_py_with_pyc(folder: str, out_folder: str | None = None) -> list[str]
         if not os.path.isfile(filepath):
             continue
 
-        filename = file.removesuffix(".py")
+        filename = removesuffix(file, ".py")
         pycache_filename = f"{filename}.cpython-3{sys.version_info.minor}.pyc"
         pyc_path = os.path.join(pycache_path, pycache_filename)
         if not os.path.exists(pyc_path):
