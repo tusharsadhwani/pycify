@@ -71,3 +71,32 @@ def test_pycify() -> None:
 
     finally:
         shutil.rmtree(clone_path, ignore_errors=True)
+
+
+def test_ignore_file_patterns() -> None:
+    """Ensure ignore_file_patterns work as expected."""
+    clone_url = "https://github.com/tusharsadhwani/packaged"
+    commit_oid = "e2f1d54"
+    clone_path = os.path.join(os.path.dirname(__file__), "packaged")
+
+    try:
+        subprocess.check_call(["git", "clone", clone_url, clone_path])
+        subprocess.check_call(["git", "checkout", commit_oid], cwd=clone_path)
+
+        pycify.replace_py_with_pyc(
+            clone_path,
+            ignore_file_patterns=["example", "setup.py", "tests/**", "**/__main__.*"],
+        )
+        files = pyc_tree(clone_path)
+        assert files == {
+            "src": {
+                "packaged": {
+                    "config.pyc": {},
+                    "cli.pyc": {},
+                    "__init__.pyc": {},
+                },
+            },
+        }
+
+    finally:
+        shutil.rmtree(clone_path, ignore_errors=True)
