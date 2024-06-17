@@ -6,8 +6,9 @@ import os
 import re
 import shutil
 import sys
-import yen.github
 import subprocess
+
+import yen.github
 
 
 class PythonNotAvailable(Exception):
