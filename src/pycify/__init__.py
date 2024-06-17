@@ -67,22 +67,14 @@ def _replace_py_with_pyc(
     else:
         # Use `yen` to ensure a portable Python is present on the system
         python_version, yen_python_bin_path = ensure_python(python_version)
-        compile_command = f"{yen_python_bin_path} -m compileall -q -f {folder}"
         try:
             subprocess.run(
-                [compile_command],
-                shell=True,
-                env={
-                    "PATH": os.pathsep.join(
-                        [yen_python_bin_path, os.environ.get("PATH", "")]
-                    )
-                },
-                cwd=folder,
+                [yen_python_bin_path, "-mcompileall", "-q", "-f", folder],
                 check=True,
                 capture_output=True,
             )
         except subprocess.CalledProcessError as exc:
-            print("*** Build Failed:", file=sys.stderr)
+            print("*** Pycify Failed:", file=sys.stderr)
             print("Stdout:\n" + exc.stdout.decode(errors="ignore"), file=sys.stderr)
             print("Stderr:\n" + exc.stdout.decode(errors="ignore"), file=sys.stderr)
             raise
